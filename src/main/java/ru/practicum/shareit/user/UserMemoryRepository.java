@@ -7,6 +7,7 @@ import ru.practicum.shareit.exception.DuplicatedDataException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.service.IdGenerator;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +22,7 @@ public class UserMemoryRepository extends IdGenerator {
     private final UserMapper userMapper;
     Map<Integer, User> usersMap = new HashMap<>();
 
-    public UserDto addUser(UserDto userDtoRequest) {
+    public User addUser(UserDto userDtoRequest) {
         if (userDtoRequest.getEmail() == null || userDtoRequest.getEmail().isEmpty()) {
             log.error("В запросе не найден имел, У пользователя должен быть имейл.");
             throw new ValidationException("У пользователя должен быть имейл.");
@@ -35,20 +36,20 @@ public class UserMemoryRepository extends IdGenerator {
 
         usersMap.put(user.getId(), user);
         log.info("Пользователь с id " + user.getId() + " добавлен");
-        return userMapper.mapToUserDto(user);
+        return user;
     }
 
-    public List<UserDto> getUsers() {
-        List<UserDto> userDtoList = usersMap.values().stream().map(user -> userMapper.mapToUserDto(user)).toList();
+    public List<User> getUsers() {
+        List<User> userDtoList = new ArrayList<>(usersMap.values());
         log.info("Все пользователи получены.");
         return userDtoList;
     }
 
-    public UserDto getUserById(Integer userId) {
-        return userMapper.mapToUserDto(usersMap.get(userId));
+    public User getUserById(Integer userId) {
+        return usersMap.get(userId);
     }
 
-    public UserDto updateUser(UserDto userDtoRequest, Integer userId) {
+    public User updateUser(UserDto userDtoRequest, Integer userId) {
         if (!usersMap.containsKey(userId)) {
             log.error("пользователь с id {} не найден.", userId);
             throw new RuntimeException("Пользовтеь с id " + userId + " не найден.");
@@ -67,13 +68,21 @@ public class UserMemoryRepository extends IdGenerator {
         usersMap.put(userId, user);
         log.info("Пользователь с id {} обновлен", userId);
 
-        return userMapper.mapToUserDto(user);
+        return user;
     }
 
-    public UserDto deleteUser(Integer userId) {
-        UserDto user = userMapper.mapToUserDto(usersMap.get(userId));
-        usersMap.remove(userId);
-        return  user;
+    public User deleteUser(Integer userId) {
+        User user = new User();
+        if (usersMap.containsKey(userId)) {
+            user = usersMap.get(userId);
+            usersMap.remove(userId);
+
+            log.info("Пользователь с id {} удален", userId);
+            return user;
+        } else {
+            log.info("Пользователь с id {} не найден", userId);
+            return null;
+        }
     }
 
     public void emailValidator(String email) {

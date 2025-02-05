@@ -9,29 +9,30 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserMemoryRepository userMemoryRepository;
+    private final UserMapper userMapper;
 
     @Override
     public UserDto addUser(UserDto userDtoRequest) {
-        return userMemoryRepository.addUser(userDtoRequest);
+        return userMapper.mapToUserDto(userMemoryRepository.addUser(userDtoRequest));
     }
 
     @Override
     public List<UserDto> getUsers() {
-        return userMemoryRepository.getUsers();
+        return userMemoryRepository.getUsers().stream().map(userMapper::mapToUserDto).toList();
     }
 
     @Override
     public UserDto getUserById(Integer userId) {
-        return userMemoryRepository.getUserById(userId);
+        return userMapper.mapToUserDto(userMemoryRepository.getUserById(userId));
     }
 
     @Override
     public UserDto updateUser(UserDto userDtoRequest, Integer userId) {
-        return userMemoryRepository.updateUser(userDtoRequest, userId);
+        return userMapper.mapToUserDto(userMemoryRepository.updateUser(userDtoRequest, userId));
     }
 
     @Override
     public UserDto deleteUser(Integer userId) {
-        return userMemoryRepository.deleteUser(userId);
+        return userMapper.mapToUserDto(userMemoryRepository.deleteUser(userId));
     }
 }

@@ -8,6 +8,8 @@ import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.service.IdGenerator;
+import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserMemoryRepository;
 
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -43,7 +46,7 @@ public class ItemMemoryRepository extends IdGenerator {
         }
 
         Item item = itemMapper.mapToItem(itemDtoRequest);
-        item.setOwner(userId);
+        item.setOwner(userMemoryRepository.getUserById(userId));
         item.setId(getNextId(itemsMap));
         itemsMap.put(item.getId(), item);
 
@@ -57,8 +60,8 @@ public class ItemMemoryRepository extends IdGenerator {
             throw new NotFoundException("Предмет с таким id не найден.");
         }
 
-        Integer itemsOwnerId = itemsMap.get(itemId).getOwner();
-        if (!itemsOwnerId.equals(userId)) {
+        Integer itemsOwnerId = itemsMap.get(itemId).getOwner().getId();
+        if (itemsOwnerId != userId) {
             log.error("Id польльзователя: {} не совпадает с id владельца: {} изменяемой вещи.", userId, itemsOwnerId);
             throw new NotFoundException("Вносить изменения может только владелец вещи.");
         }
@@ -90,8 +93,11 @@ public class ItemMemoryRepository extends IdGenerator {
         List<ItemDto> ownerItemsList = new ArrayList<>();
 
         allItems.forEach(item -> {
-            if (item.getOwner().equals(ownerId)) {
-                ownerItemsList.add(itemMapper.mapToItemDto(item));
+            User owner = item.getOwner();
+            if (owner != null) {
+                if (Objects.equals(owner.getId(), ownerId)) {
+                    ownerItemsList.add(itemMapper.mapToItemDto(item));
+                }
             }
         });
 
