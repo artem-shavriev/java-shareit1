@@ -9,7 +9,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.service.IdGenerator;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserMemoryRepository;
 
 import java.util.ArrayList;
@@ -61,7 +60,7 @@ public class ItemMemoryRepository extends IdGenerator {
         }
 
         Integer itemsOwnerId = itemsMap.get(itemId).getOwner().getId();
-        if (itemsOwnerId != userId) {
+        if (!Objects.equals(itemsOwnerId, userId)) {
             log.error("Id польльзователя: {} не совпадает с id владельца: {} изменяемой вещи.", userId, itemsOwnerId);
             throw new NotFoundException("Вносить изменения может только владелец вещи.");
         }
