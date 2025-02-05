@@ -58,7 +58,7 @@ public class ItemMemoryRepository extends IdGenerator {
         }
 
         Integer itemsOwnerId = itemsMap.get(itemId).getOwner();
-        if (itemsOwnerId != userId) {
+        if (!itemsOwnerId.equals(userId)) {
             log.error("Id польльзователя: {} не совпадает с id владельца: {} изменяемой вещи.", userId, itemsOwnerId);
             throw new NotFoundException("Вносить изменения может только владелец вещи.");
         }
@@ -90,7 +90,7 @@ public class ItemMemoryRepository extends IdGenerator {
         List<ItemDto> ownerItemsList = new ArrayList<>();
 
         allItems.forEach(item -> {
-            if (item.getOwner() == ownerId) {
+            if (item.getOwner().equals(ownerId)) {
                 ownerItemsList.add(itemMapper.mapToItemDto(item));
             }
         });
