@@ -39,9 +39,9 @@ public class UserMemoryRepository extends IdGenerator {
     }
 
     public List<UserDto> getUsers() {
-        List<UserDto> UserDtoList = usersMap.values().stream().map(user -> userMapper.mapToUserDto(user)).toList();
+        List<UserDto> userDtoList = usersMap.values().stream().map(user -> userMapper.mapToUserDto(user)).toList();
         log.info("Все пользователи получены.");
-        return UserDtoList;
+        return userDtoList;
     }
 
     public UserDto getUserById(Integer userId) {
