@@ -12,8 +12,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -63,7 +61,13 @@ public class UserMemoryRepository extends IdGenerator {
 
         User user = usersMap.get(userId);
 
-        user = userMapper.updateUserFields(user, userDtoRequest);
+        if (userDtoRequest.hasName()) {
+            user.setName(userDtoRequest.getName());
+        }
+
+        if (userDtoRequest.hasEmail()) {
+            user.setEmail(userDtoRequest.getEmail());
+        }
 
         usersMap.put(userId, user);
         log.info("Пользователь с id {} обновлен", userId);
@@ -72,9 +76,8 @@ public class UserMemoryRepository extends IdGenerator {
     }
 
     public User deleteUser(Integer userId) {
-        User user = new User();
         if (usersMap.containsKey(userId)) {
-            user = usersMap.get(userId);
+            User user = usersMap.get(userId);
             usersMap.remove(userId);
 
             log.info("Пользователь с id {} удален", userId);
@@ -86,14 +89,6 @@ public class UserMemoryRepository extends IdGenerator {
     }
 
     public void emailValidator(String email) {
-        Pattern pattern = Pattern.compile("\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*\\.\\w{2,4}");
-        Matcher matcher = pattern.matcher(email);
-        boolean matches = matcher.matches();
-
-        if (!matches) {
-            throw new ValidationException("Имейл в неверном формате.");
-        }
-
         Collection<User> allUsersList = usersMap.values();
 
         allUsersList.forEach(user -> {

@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoUpdate;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto updateItem(Integer itemId, ItemDto itemDtoRequest, Integer userId) {
+    public ItemDto updateItem(Integer itemId, ItemDtoUpdate itemDtoRequest, Integer userId) {
         return itemMemoryRepository.updateItem(itemId, itemDtoRequest, userId);
     }
 

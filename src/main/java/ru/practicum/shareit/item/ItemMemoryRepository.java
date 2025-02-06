@@ -3,9 +3,10 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoUpdate;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.service.IdGenerator;
 import ru.practicum.shareit.user.User;
@@ -28,18 +29,6 @@ public class ItemMemoryRepository extends IdGenerator {
 
     public ItemDto addItem(ItemDto itemDtoRequest, Integer userId) {
 
-        if (itemDtoRequest.getAvailable() == null) {
-            throw new ValidationException("Поле доступности не должно быть null");
-        }
-
-        if (itemDtoRequest.getName() == null || itemDtoRequest.getName().isBlank()) {
-            throw new ValidationException("Item name не должно быть null");
-        }
-
-        if (itemDtoRequest.getDescription() == null || itemDtoRequest.getDescription().isBlank()) {
-            throw new ValidationException("Item name не должно быть null");
-        }
-
         if (userMemoryRepository.getUserById(userId) == null) {
             throw new NotFoundException("Пользовтель с данным id не найден.");
         }
@@ -53,7 +42,7 @@ public class ItemMemoryRepository extends IdGenerator {
         return itemMapper.mapToItemDto(item);
     }
 
-    public ItemDto updateItem(Integer itemId, ItemDto itemDtoRequest, Integer userId) {
+    public ItemDto updateItem(Integer itemId, ItemDtoUpdate itemDtoRequest, Integer userId) {
         if (!itemsMap.containsKey(itemId)) {
             log.error("Предмет с id {} не найден.", itemId);
             throw new NotFoundException("Предмет с таким id не найден.");
@@ -62,7 +51,7 @@ public class ItemMemoryRepository extends IdGenerator {
         Integer itemsOwnerId = itemsMap.get(itemId).getOwner().getId();
         if (!Objects.equals(itemsOwnerId, userId)) {
             log.error("Id польльзователя: {} не совпадает с id владельца: {} изменяемой вещи.", userId, itemsOwnerId);
-            throw new NotFoundException("Вносить изменения может только владелец вещи.");
+            throw new AccessDeniedException ("Вносить изменения может только владелец вещи.");
         }
 
         Item updatedItem = new Item();

@@ -28,17 +28,4 @@ public class UserMapper {
 
         return user;
     }
-
-    public static User updateUserFields(User user, UserDto request) {
-
-        if (request.hasName()) {
-            user.setName(request.getName());
-        }
-
-        if (request.hasEmail()) {
-            user.setEmail(request.getEmail());
-        }
-
-        return user;
-    }
 }
