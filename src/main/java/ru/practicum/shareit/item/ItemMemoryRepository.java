@@ -51,7 +51,7 @@ public class ItemMemoryRepository extends IdGenerator {
         Integer itemsOwnerId = itemsMap.get(itemId).getOwner().getId();
         if (!Objects.equals(itemsOwnerId, userId)) {
             log.error("Id польльзователя: {} не совпадает с id владельца: {} изменяемой вещи.", userId, itemsOwnerId);
-            throw new AccessDeniedException ("Вносить изменения может только владелец вещи.");
+            throw new AccessDeniedException("Вносить изменения может только владелец вещи.");
         }
 
         Item updatedItem = new Item();
